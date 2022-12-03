@@ -136,6 +136,34 @@ defmodule Two do
       ["C Z"] -> 3 + 3
     end
   end
+
+  # rock = 1 A
+  # paper =2 B
+  # scissors =3 C
+
+  def part_two([tool, "X"]) do
+    case tool do
+      "A" -> 3
+      "B" -> 1
+      "C" -> 2
+    end
+  end
+
+  def part_two([tool, "Y"]) do
+    case tool do
+      "A" -> 1 + 3
+      "B" -> 2 + 3
+      "C" -> 3 + 3
+    end
+  end
+
+  def part_two([tool, "Z"]) do
+    case tool do
+      "A" -> 2 + 6
+      "B" -> 3 + 6
+      "C" -> 1 + 6
+    end
+  end
 end
 ```
 
@@ -148,7 +176,19 @@ day_two = Kino.Input.read(day_two_input)
 ```
 
 ```elixir
-String.split(day_two, "\n", trim: true)
+String.split(day_two_sample, "\n", trim: true)
 |> Enum.chunk_every(1)
 |> Enum.reduce(0, fn x, acc -> Two.score(x) + acc end)
+```
+
+### part two
+
+```elixir
+String.split(day_two, "\n", trim: true)
+|> Enum.chunk_every(1)
+|> Enum.map(fn scores ->
+  Enum.map(scores, fn score -> String.split(score, " ") end)
+  |> Enum.concat()
+end)
+|> Enum.reduce(0, fn x, acc -> Two.part_two(x) + acc end)
 ```
