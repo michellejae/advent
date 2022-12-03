@@ -1,0 +1,15 @@
+# the_goods
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.7.0"}
+])
+```
+
+## day 1
+
+```elixir
+"hello" <> " world"
+```
+
+## Section
