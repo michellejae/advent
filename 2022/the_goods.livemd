@@ -8,8 +8,54 @@ Mix.install([
 
 ## day 1
 
+### part 1
+
+<!-- livebook:{"break_markdown":true} -->
+
+##### sample input
+
 ```elixir
-"hello" <> " world"
+sample_data_day_1 = "1000
+2000
+3000
+
+4000
+
+5000
+6000
+
+7000
+8000
+9000
+
+10000"
 ```
 
-## Section
+```elixir
+defmodule Advent do
+  def change_to_int(string) when string == "", do: string
+  def change_to_int(string), do: String.to_integer(string)
+end
+```
+
+```elixir
+{:ok, input} = File.read("inputs/day_1.txt")
+input
+```
+
+```elixir
+data = String.split(input, "\n\n")
+# data = Enum.map(data, fn x -> Advent.change_to_int(x) end)
+data = Enum.map(data, fn x -> [x] end)
+data = Enum.map(data, fn x -> Enum.map(x, fn y -> String.replace(y, "\n", ",") end) end)
+data = Enum.map(data, fn x -> Enum.map(x, fn y -> String.split(y, ",") end) end)
+data = Enum.concat(data)
+data = Enum.map(data, fn x -> Enum.map(x, fn y -> String.to_integer(y) end) end)
+data = Enum.map(data, fn x -> Enum.reduce(x, fn y, acc -> y + acc end) end)
+data = Enum.sort(data)
+List.last(data)
+```
+
+### part two
+
+## day 2
