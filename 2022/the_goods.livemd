@@ -8,6 +8,14 @@ Mix.install([
 
 ## day 1
 
+```elixir
+input = Kino.Input.textarea("Name")
+```
+
+```elixir
+name = Kino.Input.read(input)
+```
+
 ### part 1
 
 <!-- livebook:{"break_markdown":true} -->
@@ -32,20 +40,40 @@ sample_data_day_1 = "1000
 ```
 
 ```elixir
+{:ok, day_one_input} = File.read("inputs/day_1.txt")
+day_one_input
+```
+
+```elixir
 defmodule Advent do
-  def change_to_int(string) when string == "", do: string
-  def change_to_int(string), do: String.to_integer(string)
+  def split_to_int(list) do
+    list
+    |> Enum.map(fn amount -> String.replace(amount, "\n", ",") end)
+    |> Enum.map(fn amount -> String.split(amount, ",") end)
+    |> Enum.concat()
+    |> Enum.map(fn amount -> String.to_integer(amount) end)
+  end
 end
 ```
 
+new clean way
+
 ```elixir
-{:ok, input} = File.read("inputs/day_1.txt")
-input
+day_one =
+  String.split(sample_data_day_1, "\n\n")
+  |> Enum.map(fn x -> String.split(x, ",") end)
+  |> Enum.map(fn elf_amount -> Advent.split_to_int(elf_amount) end)
+  |> Enum.map(fn elf_amount -> Enum.reduce(elf_amount, fn amount, acc -> amount + acc end) end)
 ```
 
 ```elixir
-data = String.split(input, "\n\n")
-# data = Enum.map(data, fn x -> Advent.change_to_int(x) end)
+Enum.max(day_one)
+```
+
+old UGLY way
+
+```elixir
+data = String.split(day_one_input, "\n\n")
 data = Enum.map(data, fn x -> [x] end)
 data = Enum.map(data, fn x -> Enum.map(x, fn y -> String.replace(y, "\n", ",") end) end)
 data = Enum.map(data, fn x -> Enum.map(x, fn y -> String.split(y, ",") end) end)
@@ -58,4 +86,69 @@ List.last(data)
 
 ### part two
 
+```elixir
+day_one
+|> Enum.sort()
+|> Enum.take(-3)
+|> Enum.sum()
+```
+
 ## day 2
+
+```elixir
+input = Kino.Input.textarea("Paste input here:")
+```
+
+```elixir
+day_two_input = Kino.Input.textarea("Day two input:")
+```
+
+A : X = 3
+A : Y = 6
+A : Z = 0
+B : X = 0
+B : Y = 3
+B : Z = 6
+C : X = 6
+C : Y = 0
+C : Z = 3
+
+A = Rock
+B = Paper
+C = Scissors
+
+X = Rock
+Y = Paper 
+Z = Scissors
+
+```elixir
+defmodule Two do
+  def score(scores) do
+    case scores do
+      ["A X"] -> 3 + 1
+      ["A Y"] -> 6 + 2
+      ["A Z"] -> 0 + 3
+      ["B X"] -> 0 + 1
+      ["B Y"] -> 3 + 2
+      ["B Z"] -> 6 + 3
+      ["C X"] -> 6 + 1
+      ["C Y"] -> 0 + 2
+      ["C Z"] -> 3 + 3
+    end
+  end
+end
+```
+
+```elixir
+day_two_sample = Kino.Input.read(input)
+```
+
+```elixir
+day_two = Kino.Input.read(day_two_input)
+```
+
+```elixir
+String.split(day_two, "\n", trim: true)
+|> Enum.chunk_every(1)
+|> Enum.reduce(0, fn x, acc -> Two.score(x) + acc end)
+```
