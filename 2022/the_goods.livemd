@@ -195,6 +195,8 @@ end)
 
 ## day 3
 
+### part 1
+
 ```elixir
 three_sample_input = Kino.Input.textarea("Paste input here:")
 ```
@@ -204,9 +206,19 @@ day_three_sample = Kino.Input.read(three_sample_input)
 ```
 
 ```elixir
+lower = for n <- ?a..?z, do: <<n::integer>>
+lower
+# upper = for n <- ?A..?Z, do: << n :: binary >>
+```
+
+```elixir
+
+```
+
+```elixir
 defmodule Three do
   def break_down(rucksack) do
-    Enum.map(rucksack, fn x -> String.split(x, String.length(x) / 2) end)
+    Enum.map(rucksack, fn x -> String.graphemes(x) end)
   end
 end
 ```
@@ -215,8 +227,10 @@ end
 String.split(day_three_sample)
 |> Enum.chunk_every(1)
 |> Enum.map(fn x -> Three.break_down(x) end)
+|> Enum.concat()
+|> Enum.map(fn x -> Enum.chunk_every(x, trunc(length(x) / 2)) end)
 ```
 
 ```elixir
-String.length("jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL")
+trunc(String.length("jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL") / 2)
 ```
