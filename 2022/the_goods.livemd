@@ -192,3 +192,31 @@ String.split(day_two, "\n", trim: true)
 end)
 |> Enum.reduce(0, fn x, acc -> Two.part_two(x) + acc end)
 ```
+
+## day 3
+
+```elixir
+three_sample_input = Kino.Input.textarea("Paste input here:")
+```
+
+```elixir
+day_three_sample = Kino.Input.read(three_sample_input)
+```
+
+```elixir
+defmodule Three do
+  def break_down(rucksack) do
+    Enum.map(rucksack, fn x -> String.split(x, String.length(x) / 2) end)
+  end
+end
+```
+
+```elixir
+String.split(day_three_sample)
+|> Enum.chunk_every(1)
+|> Enum.map(fn x -> Three.break_down(x) end)
+```
+
+```elixir
+String.length("jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL")
+```
