@@ -195,24 +195,27 @@ end)
 
 ## day 3
 
-### part 1
-
 ```elixir
-three_sample_input = Kino.Input.textarea("Paste input here:")
+three_sample_input = Kino.Input.textarea("Here")
 ```
 
 ```elixir
-day_three_sample = Kino.Input.read(three_sample_input)
+three_sample = Kino.Input.read(three_sample_input)
 ```
 
 ```elixir
-lower = for n <- ?a..?z, do: <<n::integer>>
-lower
-# upper = for n <- ?A..?Z, do: << n :: binary >>
+three_input = Kino.Input.textarea("Paste input here:")
 ```
 
 ```elixir
+day_three = Kino.Input.read(three_input)
+```
 
+```elixir
+lower = for n <- ?a..?z, do: <<n::utf8>>
+upper = for n <- ?A..?Z, do: <<n::utf8>>
+alpha = lower ++ upper
+length(alpha)
 ```
 
 ```elixir
@@ -220,17 +223,58 @@ defmodule Three do
   def break_down(rucksack) do
     Enum.map(rucksack, fn x -> String.graphemes(x) end)
   end
+
+  def get_dupes(list) do
+    list -- Enum.uniq(list)
+  end
+
+  def get_keys(list) do
+  end
 end
 ```
 
+### part 1
+
 ```elixir
-String.split(day_three_sample)
+String.split(day_three)
 |> Enum.chunk_every(1)
 |> Enum.map(fn x -> Three.break_down(x) end)
 |> Enum.concat()
 |> Enum.map(fn x -> Enum.chunk_every(x, trunc(length(x) / 2)) end)
+|> Enum.map(fn x -> Enum.map(x, fn y -> MapSet.new(y) end) end)
+|> Enum.map(fn x -> MapSet.intersection(List.first(x), List.last(x)) end)
+|> Enum.map(fn x -> MapSet.to_list(x) end)
+|> Enum.concat()
+|> Enum.map(fn x -> Enum.find_index(alpha, fn y -> y == x end) + 1 end)
+|> Enum.sum()
+```
+
+```elixir
+String.split(day_three)
+|> Enum.chunk_every(1)
+|> Enum.map(fn x -> Three.break_down(x) end)
+|> Enum.concat()
+|> Enum.map(fn x -> Enum.chunk_every(x, trunc(length(x) / 2)) end)
+|> Enum.map(fn x -> Enum.map(x, fn y -> Enum.uniq(y) end) end)
+|> Enum.map(fn x -> Enum.concat(x) end)
+|> Enum.map(fn x -> Three.get_dupes(x) end)
+|> Enum.concat()
+|> Enum.map(fn x -> Enum.find_index(alpha, fn y -> y == x end) + 1 end)
+|> Enum.sum()
 ```
 
 ```elixir
 trunc(String.length("jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL") / 2)
+```
+
+### part 2
+
+```elixir
+threes =
+  String.split(three_sample)
+  |> Enum.chunk_every(1)
+  |> Enum.map(fn x -> Three.break_down(x) end)
+  |> Enum.concat()
+  |> Enum.map(fn y -> MapSet.new(y) end)
+  |> Enum.chunk_every(3)
 ```
