@@ -271,10 +271,121 @@ trunc(String.length("jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL") / 2)
 
 ```elixir
 threes =
-  String.split(three_sample)
+  String.split(day_three)
   |> Enum.chunk_every(1)
   |> Enum.map(fn x -> Three.break_down(x) end)
   |> Enum.concat()
   |> Enum.map(fn y -> MapSet.new(y) end)
   |> Enum.chunk_every(3)
+  |> Enum.map(fn x -> Enum.chunk_every(x, 2) end)
+  |> Enum.map(fn x ->
+    Enum.map(x, fn y -> MapSet.intersection(List.first(y), List.last(y)) end)
+  end)
+  |> Enum.map(fn x -> MapSet.intersection(List.first(x), List.last(x)) end)
+  |> Enum.map(fn x -> MapSet.to_list(x) end)
+  |> Enum.concat()
+  |> Enum.map(fn x -> Enum.find_index(alpha, fn y -> y == x end) + 1 end)
+  |> Enum.sum()
+```
+
+## day 4
+
+### part 1
+
+```elixir
+four_sample_input = Kino.Input.textarea("Here")
+```
+
+```elixir
+four_day_input = Kino.Input.textarea("Here")
+```
+
+```elixir
+day_four = Kino.Input.read(four_day_input)
+```
+
+```elixir
+four_sample = Kino.Input.read(four_sample_input)
+```
+
+```elixir
+defmodule Four do
+  def compare_maps(map1, map2) do
+    MapSet.subset?(map1, map2) || MapSet.subset?(map2, map1)
+  end
+
+  def overlap_maps(map1, map2) do
+    MapSet.disjoint?(map1, map2) || MapSet.disjoint?(map2, map1)
+  end
+end
+```
+
+```elixir
+String.split(day_four, "\n", trim: true)
+|> Enum.map(fn pairs -> String.split(pairs, ",") end)
+|> Enum.map(fn pairs -> Enum.map(pairs, fn y -> String.split(y, "-") end) end)
+|> Enum.concat()
+|> Enum.map(fn pairs -> Enum.map(pairs, fn y -> String.to_integer(y) end) end)
+|> Enum.map(fn pairs -> MapSet.new(List.first(pairs)..List.last(pairs)) end)
+|> Enum.chunk_every(2)
+|> Enum.map(fn pairs -> Four.compare_maps(List.first(pairs), List.last(pairs)) end)
+|> Enum.count(fn x -> x == true end)
+```
+
+### part 2
+
+```elixir
+String.split(day_four, "\n", trim: true)
+|> Enum.map(fn pairs -> String.split(pairs, ",") end)
+|> Enum.map(fn pairs -> Enum.map(pairs, fn y -> String.split(y, "-") end) end)
+|> Enum.concat()
+|> Enum.map(fn pairs -> Enum.map(pairs, fn y -> String.to_integer(y) end) end)
+|> Enum.map(fn pairs -> MapSet.new(List.first(pairs)..List.last(pairs)) end)
+|> Enum.chunk_every(2)
+|> Enum.map(fn pairs -> Four.overlap_maps(List.first(pairs), List.last(pairs)) end)
+|> Enum.count(fn x -> x == false end)
+```
+
+## day 5
+
+### part 1
+
+```elixir
+five_sample_input = Kino.Input.textarea("five sample")
+```
+
+```elixir
+five_sample = Kino.Input.read(five_sample_input)
+```
+
+```elixir
+defmodule Four do
+  defp parse_moves(list) do
+    Enum.map(list, fn x -> String.split(x, "\n") end)
+    |> Enum.concat()
+    |> Enum.map(fn x -> String.split(x, " ") end)
+    |> Enum.map(fn x -> Enum.drop_every(x, 2) end)
+    |> Enum.map(fn x -> Enum.map(x, fn y -> String.to_integer(y) end) end)
+  end
+
+  def parse_stacks(stacks) do
+    String.split(stacks, "\n")
+    |> Enum.drop(-1)
+    |> Enum.map(fn x -> String.replace(x, " [", ",[") end)
+    |> Enum.map(fn x -> String.replace(x, "] ", "],") end)
+    |> Enum.map(fn x -> String.split(x, ",") end)
+    |> List.zip()
+    |> Enum.map(fn x -> Tuple.to_list(x) end)
+    |> Enum.map(fn x -> Enum.join(x) end)
+    |> Enum.map(fn x -> String.split(x) end)
+  end
+end
+```
+
+```elixir
+[stacks | moves] = String.split(five_sample, "\n\n")
+
+stacks = Four.parse_stacks(stacks)
+
+moves = Four.parse_moves(moves)
 ```
