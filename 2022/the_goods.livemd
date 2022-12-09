@@ -360,13 +360,20 @@ five_sample = Kino.Input.read(five_sample_input)
 
 ```elixir
 defmodule Four do
-  defp parse_moves(list) do
+  def move_crates([move_amount, move_from, move_to], stacks) do
+    from = Enum.at(stacks, move_from - 1)
+    movers = Enum.take(from, move_amount)
+  end
+
+  def parse_moves(list) do
     Enum.map(list, fn x -> String.split(x, "\n") end)
     |> Enum.concat()
     |> Enum.map(fn x -> String.split(x, " ") end)
     |> Enum.map(fn x -> Enum.drop_every(x, 2) end)
     |> Enum.map(fn x -> Enum.map(x, fn y -> String.to_integer(y) end) end)
   end
+
+  # [[1, 2, 1], [3, 1, 3], [2, 2, 1], [1, 1, 2]]
 
   def parse_stacks(stacks) do
     String.split(stacks, "\n")
@@ -376,9 +383,10 @@ defmodule Four do
     |> Enum.map(fn x -> String.split(x, ",") end)
     |> List.zip()
     |> Enum.map(fn x -> Tuple.to_list(x) end)
-    |> Enum.map(fn x -> Enum.join(x) end)
-    |> Enum.map(fn x -> String.split(x) end)
+    |> Enum.map(fn x -> Enum.drop_while(x, fn y -> y == "   " end) end)
   end
+
+  # [["[N]", "[Z]"], ["[D]", "[C]", "[M]"], ["[P]"]]
 end
 ```
 
@@ -388,4 +396,6 @@ end
 stacks = Four.parse_stacks(stacks)
 
 moves = Four.parse_moves(moves)
+
+Enum.map(moves, fn x -> Four.move_crates(x, stacks) end)
 ```
