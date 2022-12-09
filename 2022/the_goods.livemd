@@ -360,10 +360,10 @@ five_sample = Kino.Input.read(five_sample_input)
 
 ```elixir
 defmodule Four do
-  def move_crates([move_amount, move_from, move_to], stacks) do
-    from = Enum.at(stacks, move_from - 1)
-    movers = Enum.take(from, move_amount)
-  end
+  # def move_crates([move_amount, move_from, move_to], stacks) do
+  #   from = Enum.at(stacks, move_from - 1)
+  #   from = Enum
+  # end
 
   def parse_moves(list) do
     Enum.map(list, fn x -> String.split(x, "\n") end)
@@ -397,5 +397,10 @@ stacks = Four.parse_stacks(stacks)
 
 moves = Four.parse_moves(moves)
 
-Enum.map(moves, fn x -> Four.move_crates(x, stacks) end)
+# Enum.map(moves, fn x -> Four.move_crates(x, stacks) end)
+map = Enum.zip([1, 2, 3], [["[N]", "[Z]"], ["[D]", "[C]", "[M]"], ["[P]"]])
+
+map = Map.new(map)
+
+{:ok, from} = Map.fetch()
 ```
