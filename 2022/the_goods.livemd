@@ -359,48 +359,145 @@ five_sample = Kino.Input.read(five_sample_input)
 ```
 
 ```elixir
+[stacks | moves] = String.split(five_sample, "\n\n")
+```
+
+```elixir
+stacks =
+  String.split(stacks, "\n")
+  |> Enum.drop(-1)
+  |> Enum.map(fn x -> String.replace(x, " [", ",[") end)
+  |> Enum.map(fn x -> String.replace(x, "] ", "],") end)
+  |> Enum.map(fn x -> String.split(x, ",") end)
+  |> List.zip()
+  |> Enum.map(fn x -> Tuple.to_list(x) end)
+  |> Enum.map(fn x -> Enum.drop_while(x, fn y -> y == "   " end) end)
+  |> Enum.map(fn x -> Enum.map(x, fn y -> String.replace(y, "[", "") end) end)
+  |> Enum.map(fn x -> Enum.map(x, fn y -> String.replace(y, "]", "") end) end)
+
+crates = Enum.zip([1, 2, 3], stacks)
+
+stacks = Map.new(crates)
+```
+
+```elixir
+moves =
+  Enum.map(moves, fn x -> String.split(x, "\n") end)
+  |> Enum.concat()
+  |> Enum.map(fn x -> String.split(x, " ") end)
+  |> Enum.map(fn x -> Enum.drop_every(x, 2) end)
+  |> Enum.map(fn x -> Enum.map(x, fn y -> String.to_integer(y) end) end)
+```
+
+```elixir
+crates = ["E", "F"]
+```
+
+```elixir
 defmodule Four do
-  # def move_crates([move_amount, move_from, move_to], stacks) do
-  #   from = Enum.at(stacks, move_from - 1)
-  #   from = Enum
+  def move_crates(stacks, crates) do
+    Map.update(stacks, 1, crates, &place_crates_on_stack(crates, &1))
+
+    # Enum.map(moves, fn [amount, from, to] -> 
+    #   {crates, stack} = pop_in(stacks, [from, Access.slice(0..(amount-1))])
+    # end)
+    # Enum.reduce(moves, fn [amount, from, to], stacks -> 
+    #   {crates, stacks} = pop_in(stacks, [from, Access.slice(0..(amount - 1))])
+    #   Map.update(stacks, to, crates, fn {crates, stacks} -> stack_crates(crates, stacks) end)
+    # end)
+  end
+
+  #   def operate(model, stacks, instructions) do
+  #   instructions
+  #   |> Enum.reduce(stacks, fn [amount, from, to], stacks ->
+  #     {crates, stacks} = pop_in(stacks, [from, Access.slice(0..(amount - 1))])
+  #     Map.update(stacks, to, crates, &place_crates_on_stack(model, crates, &1))
+  #   end)
+  #   |> Map.values()
+  #   |> Enum.map(&hd/1)
+  #   |> Enum.join()
   # end
 
-  def parse_moves(list) do
-    Enum.map(list, fn x -> String.split(x, "\n") end)
-    |> Enum.concat()
-    |> Enum.map(fn x -> String.split(x, " ") end)
-    |> Enum.map(fn x -> Enum.drop_every(x, 2) end)
-    |> Enum.map(fn x -> Enum.map(x, fn y -> String.to_integer(y) end) end)
+  # defp stack_crates(crates, stacks) do
+  #   Enum.reverse(crates) ++ stacks
+  # end
+
+  defp place_crates_on_stack(crates, stack) do
+    IO.inspect(stack, label: :label)
   end
-
-  # [[1, 2, 1], [3, 1, 3], [2, 2, 1], [1, 1, 2]]
-
-  def parse_stacks(stacks) do
-    String.split(stacks, "\n")
-    |> Enum.drop(-1)
-    |> Enum.map(fn x -> String.replace(x, " [", ",[") end)
-    |> Enum.map(fn x -> String.replace(x, "] ", "],") end)
-    |> Enum.map(fn x -> String.split(x, ",") end)
-    |> List.zip()
-    |> Enum.map(fn x -> Tuple.to_list(x) end)
-    |> Enum.map(fn x -> Enum.drop_while(x, fn y -> y == "   " end) end)
-  end
-
-  # [["[N]", "[Z]"], ["[D]", "[C]", "[M]"], ["[P]"]]
 end
 ```
 
 ```elixir
-[stacks | moves] = String.split(five_sample, "\n\n")
+Four.move_crates(stacks, crates)
+```
 
-stacks = Four.parse_stacks(stacks)
+```elixir
+{start, instructions} =
+  String.split(five_sample, "\n")
+  |> Enum.split_while(&(&1 != ""))
+```
 
-moves = Four.parse_moves(moves)
+```elixir
+stacks =
+  start
+  |> Enum.reverse()
+  |> tl()
+  |> Enum.flat_map(fn level ->
+    level
+    |> String.graphemes()
+    |> Enum.chunk_every(3, 4, :discard)
+    |> Enum.with_index(1)
+  end)
+  |> Enum.reduce(%{}, fn
+    {["[", crate, "]"], stack_nr}, acc -> Map.update(acc, stack_nr, [crate], &[crate | &1])
+    _, acc -> acc
+  end)
+```
 
-# Enum.map(moves, fn x -> Four.move_crates(x, stacks) end)
-map = Enum.zip([1, 2, 3], [["[N]", "[Z]"], ["[D]", "[C]", "[M]"], ["[P]"]])
+```elixir
+instructions =
+  instructions
+  |> tl()
+  |> Enum.flat_map(&String.split(&1, ~r{[\D]}, trim: true))
+  |> Enum.map(&String.to_integer/1)
+  |> Enum.chunk_every(3)
+```
 
-map = Map.new(map)
+```elixir
+defmodule CrateMover do
+  def operate(model, stacks, instructions) do
+    instructions
+    |> Enum.reduce(stacks, fn [amount, from, to], stacks ->
+      {crates, stacks} = pop_in(stacks, [from, Access.slice(0..(amount - 1))])
+      Map.update(stacks, to, crates, &place_crates_on_stack(model, crates, &1))
+    end)
+    |> Map.values()
+    |> Enum.map(&hd/1)
+    |> Enum.join()
+  end
 
-{:ok, from} = Map.fetch()
+  defp place_crates_on_stack(:cm9000, crates, stack), do: Enum.reverse(crates) ++ stack
+  defp place_crates_on_stack(:cm9001, crates, stack), do: crates ++ stack
+end
+```
+
+```elixir
+CrateMover.operate(:cm9000, stacks, instructions)
+```
+
+```elixir
+foo = %{name: "Elixir", creator: "Valim"}
+Access.pop(foo, :name)
+```
+
+```elixir
+users = %{"john" => %{age: 27}, "meg" => %{age: 23}}
+pop_in(users, ["john", :age])
+```
+
+```elixir
+list = [1, 2, 3, 4]
+
+Enum.map(list, &nil)
 ```
