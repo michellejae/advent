@@ -1,0 +1,88 @@
+# day 1
+
+```elixir
+Mix.install([
+  {:kino, "~> 0.11.3"}
+])
+```
+
+## Input
+
+```elixir
+sample_one = "1abc2
+pqr3stu8vwx
+a1b2c3d4e5f
+treb7uchet"
+```
+
+```elixir
+input = Kino.Input.file("File")
+```
+
+```elixir
+value = Kino.Input.read(input)
+path = Kino.Input.file_path(value.file_ref)
+real_data = File.read!(path)
+```
+
+## Part One
+
+```elixir
+defmodule DayOne do
+  def parse(data) do
+    String.split(data)
+    |> Enum.map(fn el -> String.split(el, "", trim: true) end)
+    |> Enum.map(fn x -> DayOne.findNums(x) end)
+    |> Enum.map(fn x -> DayOne.firstAndLast(x) end)
+    |> Enum.map(fn x -> Enum.join(x) end)
+    |> Enum.map(fn x -> String.to_integer(x) end)
+    |> Enum.sum()
+  end
+
+  def findNums(data) do
+    Enum.flat_map(data, fn string ->
+      case Integer.parse(string) do
+        # transform to integer
+        {int, _rest} -> [to_string(int)]
+        # skip the value
+        :error -> []
+      end
+    end)
+  end
+
+  def firstAndLast(data) do
+    first = List.first(data)
+    last = List.last(data)
+    [first, last]
+  end
+end
+```
+
+```elixir
+DayOne.parse(real_data)
+```
+
+```elixir
+sample_two = "two1nine
+eightwothree
+abcone2threexyz
+xtwone3four
+4nineeightseven2
+zoneight234
+7pqrstsixteen"
+```
+
+```elixir
+Enum.map(new_data, fn x -> 
+case  do
+  :one -> "1"
+  :two -> "2"
+  :three -> "3"
+  :four -> "4"
+  :five -> "5"
+  :six -> "6"
+  :seven -> "7"
+  :eight -> "8"
+  :nine -> "9"
+end
+```
